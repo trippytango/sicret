@@ -12,7 +12,6 @@ var browserSync = require('browser-sync').create(),
 gulp.task('default', ['dev']);
 
 gulp.task('dev', function(cb) {
-//    browserSyncPort = 3000;
    runSequence('~clean:build-dest',
                'dev-deploy',
                '~server',
