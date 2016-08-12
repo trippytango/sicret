@@ -1,0 +1,6 @@
+# Temporary folders
+.builds/
+gulp/
+
+# Package folders
+node_modules/
