@@ -3,33 +3,29 @@ var buildDest = 'gulp/.builds/dev';
 
 
 var browserSync = require('browser-sync').create(),
+    del         = require('del'),
     gulp        = require('gulp'),
+    electron    = require('electron'),
     sass        = require('gulp-sass'),
-    runSequence = require('run-sequence'),
-    inject      = require('gulp-inject');
+    run         = require('gulp-run'),
+    watch       = require('gulp-watch'),
+    runSequence = require('run-sequence');
     
     
 gulp.task('default', ['dev']);
 
+gulp.task('electron', function() {
+  return run('electron src/index.html').exec();
+});
+
 gulp.task('dev', function(cb) {
    runSequence('~clean:build-dest',
-               'dev-deploy',
+               '~build:scss',
+               '~copy:files',
                '~server',
                '~watch',
                cb)
 });
-
-
-gulp.task('dev-deploy', function(cb) {
-  runSequence('~build:scss',
-              '~build:js',
-              '~inject:css',
-              '~inject:libraries',
-              '~inject:js',
-              '~inject:js-config',
-              cb);
-});
-
 
 gulp.task('~server', function(cb) {
    browserSync.init({
@@ -46,13 +42,17 @@ gulp.task('~server', function(cb) {
 });
 
 gulp.task('~watch', function() {
-    watch('src/**/*.js');
-    watch('src/**/*.html', function() {
-        
-    });
     watch('src/**/*.scss', function() {
         gulp.run('~build:scss');
     });
+});
+
+gulp.task('~copy:files', function() {
+  return gulp.src([
+    'src/**/*',
+    '!src/**/*.scss'
+  ])
+  .pipe(gulp.dest(buildDest));
 });
 
 gulp.task('~build:scss', function() {
@@ -64,19 +64,7 @@ gulp.task('~build:scss', function() {
     .pipe(browserSync.stream());
 });
 
-gulp.task('~inject:css', function() {
-  var target = gulp.src(buildDest + '/index.html'),
-    sources = gulp.src([
-      buildDest + '/**/*.css'
-    ], { read: false });
 
-  return target.pipe(inject(sources, {
-    relative: true,
-    starttag: '<!--STYLES -->',
-    endtag: '<!-- include: "type": "css", "files": ["**/*.css", "!**/_*.css"] -->'
-  }))
-  .pipe(gulp.dest(buildDest));
-});
 
 gulp.task('~clean:build-dest', function() {
   return del(buildDest);
