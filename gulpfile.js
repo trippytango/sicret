@@ -22,6 +22,7 @@ gulp.task('dev', function(cb) {
    runSequence('~clean:build-dest',
                '~build:scss',
                '~copy:files',
+               '~copy:libraries',
                '~server',
                '~watch',
                cb)
@@ -50,9 +51,18 @@ gulp.task('~watch', function() {
 gulp.task('~copy:files', function() {
   return gulp.src([
     'src/**/*',
-    '!src/**/*.scss'
+    '!src/**/*.scss',
   ])
   .pipe(gulp.dest(buildDest));
+});
+
+gulp.task('~copy:libraries', function() {
+  return gulp.src([
+    'libraries/angular/angular.js',
+    'libraries/angular-ui-router/release/angular-ui-router.js',
+    'libraries/lodash/lodash.js'
+  ])
+  .pipe(gulp.dest(buildDest + '/libraries'));
 });
 
 gulp.task('~build:scss', function() {
