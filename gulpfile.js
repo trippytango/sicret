@@ -67,9 +67,12 @@ gulp.task('~server', function(cb) {
 });
 
 gulp.task('~watch', function() {
-    watch('src/**/*.scss', function() {
-        gulp.run('~build:scss');
-    });
+    gulp.watch('src/**/*.scss', ['~build:scss']);
+
+    gulp.watch([
+      'src/**/*.js',
+      'src/**/*.html'
+    ], ['~copy:files']);
 });
 
 gulp.task('~copy:files', function() {
@@ -77,7 +80,8 @@ gulp.task('~copy:files', function() {
     'src/**/*',
     '!src/**/*.scss',
   ])
-  .pipe(gulp.dest(buildDest));
+  .pipe(gulp.dest(buildDest))
+  .pipe(browserSync.stream());;
 });
 
 gulp.task('~copy:libraries', function() {
