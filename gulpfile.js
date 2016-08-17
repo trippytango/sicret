@@ -1,11 +1,11 @@
-var buildDest = 'gulp/.builds/dev';
+'use strict';
 
-
+var buildDest = '.builds/dev';
 
 var browserSync = require('browser-sync').create(),
     del         = require('del'),
     gulp        = require('gulp'),
-    electron    = require('electron'),
+    electron    = require('electron-connect').server.create(),
     sass        = require('gulp-sass'),
     run         = require('gulp-run'),
     watch       = require('gulp-watch'),
@@ -15,7 +15,7 @@ var browserSync = require('browser-sync').create(),
 gulp.task('default', ['dev']);
 
 gulp.task('electron', function() {
-  return run('electron src/index.html').exec();
+  return run('electron .builds/dev/index.html').exec();
 });
 
 gulp.task('dev', function(cb) {
@@ -26,6 +26,30 @@ gulp.task('dev', function(cb) {
                '~server',
                '~watch',
                cb)
+});
+
+// gulp.task('devElectron', function(cb) { // In Progress
+//    runSequence('~clean:build-dest',
+//                '~build:scss',
+//                '~copy:files',
+//                '~copy:libraries',
+//                '~watch:electron',
+//                cb)
+// });
+
+gulp.task('serve:electron', function() {
+  // Start browser process 
+  electron.start();
+ 
+  // Restart browser process 
+  //gulp.watch('~watch', electron.restart);
+ 
+  // Reload renderer process 
+  // gulp.watch(['index.js', 'index.html'], electron.reload);
+});
+
+gulp.task('~watch:electron', function() {
+    // In progress
 });
 
 gulp.task('~server', function(cb) {
@@ -73,8 +97,6 @@ gulp.task('~build:scss', function() {
     .pipe(gulp.dest(buildDest))
     .pipe(browserSync.stream());
 });
-
-
 
 gulp.task('~clean:build-dest', function() {
   return del(buildDest);
